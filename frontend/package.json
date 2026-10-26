@@ -1,0 +1,35 @@
+{
+  "name": "qrio-frontend",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "nuxt dev",
+    "build": "nuxt build",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare",
+    "typecheck": "nuxt typecheck",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@nuxt/fonts": "^1.2.0",
+    "@nuxtjs/robots": "^7.0.2",
+    "@nuxtjs/sitemap": "^9.1.0",
+    "@tailwindcss/vite": "^4.3.3",
+    "jspdf": "^4.2.1",
+    "lucide-vue-next": "^1.0.0",
+    "motion-v": "^2.8.0",
+    "nuxt": "^4.6.2",
+    "nuxt-schema-org": "^7.0.1",
+    "qr-code-styling": "^1.9.2",
+    "tailwindcss": "^4.3.3",
+    "vue": "latest",
+    "vue-router": "latest",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@types/node": "^22.20.5",
+    "typescript": "^5.9.0",
+    "vitest": "^5.0.5",
+    "vue-tsc": "^3.3.13"
+  }
+}
