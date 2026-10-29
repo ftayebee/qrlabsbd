@@ -8,7 +8,9 @@ import type { H3Event } from 'h3'
  */
 export function proxyToApi(event: H3Event) {
   const config = useRuntimeConfig(event)
-  const target = config.apiInternalUrl.replace(/\/$/, '') + event.path
+  // The base is Laravel's origin. Drop a trailing "/api" in case the env var was
+  // set to the API prefix, which would otherwise yield /api/api/v1 and /api/sanctum.
+  const target = config.apiInternalUrl.replace(/\/+$/, '').replace(/\/api$/, '') + event.path
   const siteUrl = config.public.siteUrl.replace(/\/$/, '')
   const headers = getRequestHeaders(event)
 
