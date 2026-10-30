@@ -1,6 +1,12 @@
 <?php
 
 return [
+    // Product identity shown in emails. Kept apart from APP_NAME, which is an internal label.
+    'brand' => [
+        'name' => env('QRIO_BRAND_NAME', 'Qrio'),
+        'support_email' => env('QRIO_SUPPORT_EMAIL'),
+    ],
+
     // Domain encoded into dynamic QR codes. Must route /r/{code} to this API.
     'short_domain' => env('QRIO_SHORT_DOMAIN', env('FRONTEND_URL', 'http://localhost:3000')),
 

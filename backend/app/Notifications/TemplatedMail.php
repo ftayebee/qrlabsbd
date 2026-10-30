@@ -15,7 +15,7 @@ trait TemplatedMail
     /** @param array<string, string> $vars */
     protected function templated(string $key, array $vars, string $defaultSubject, string $defaultBody, ?string $actionText = null, ?string $actionUrl = null): MailMessage
     {
-        $vars += ['app_name' => (string) config('app.name')];
+        $vars += ['app_name' => (string) config('qrio.brand.name')];
         $template = EmailTemplate::query()->where('key', $key)->where('is_active', true)->first()
             ?? new EmailTemplate(['subject' => $defaultSubject, 'body' => $defaultBody]);
         $rendered = $template->render($vars);

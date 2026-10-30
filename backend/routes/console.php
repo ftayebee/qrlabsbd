@@ -29,4 +29,7 @@ Artisan::command('qrio:expire-subscriptions', function (SubscriptionService $sub
 Schedule::command('qrio:prune-scans')->dailyAt('03:15')->withoutOverlapping()->onOneServer();
 Schedule::command('qrio:expire-subscriptions')->hourly()->withoutOverlapping()->onOneServer();
 Schedule::command('queue:prune-failed --hours=720')->daily();
+// Shared hosting has no long-running worker: the per-minute schedule:run cron drains
+// the queue (emails, scan recording, webhooks) and exits before the next run starts.
+Schedule::command('queue:work --stop-when-empty --max-time=50 --tries=3')->everyMinute()->withoutOverlapping(5);
 Schedule::command('auth:clear-resets')->everyFifteenMinutes();
