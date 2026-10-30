@@ -18,12 +18,15 @@ return [
     |
     */
 
-    'stateful' => explode(',', env('SANCTUM_STATEFUL_DOMAINS', sprintf(
+    // The Nuxt frontend proxies to this API and forwards its own host in
+    // X-Forwarded-Host, so the current request host is the frontend's domain.
+    // It and FRONTEND_URL are always stateful, even when the env list omits them;
+    // without that, login has no session and fails with "Session store not set".
+    'stateful' => array_values(array_unique(array_filter(explode(',', env('SANCTUM_STATEFUL_DOMAINS', sprintf(
         '%s%s',
         'localhost,localhost:3000,127.0.0.1,127.0.0.1:8000,::1',
         Sanctum::currentApplicationUrlWithPort(),
-        // Sanctum::currentRequestHost(),
-    ))),
+    )).Sanctum::currentRequestHost().','.parse_url((string) env('FRONTEND_URL', ''), PHP_URL_HOST))))),
 
     /*
     |--------------------------------------------------------------------------

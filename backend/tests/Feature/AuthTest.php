@@ -12,6 +12,8 @@ class AuthTest extends TestCase
     public function test_register_login_logout_flow(): void
     {
         Notification::fake();
+        // Act as the SPA: Sanctum only starts a session for requests from a stateful frontend.
+        $this->withHeader('Referer', config('app.frontend_url').'/register');
         $this->postJson('/api/v1/auth/register', [
             'name' => 'Sam', 'email' => 'Sam@Example.com', 'password' => 'correct-horse-9', 'password_confirmation' => 'correct-horse-9', 'terms' => true,
         ])->assertCreated()->assertJsonPath('data.email', 'sam@example.com')->assertJsonPath('data.emailVerified', false);
