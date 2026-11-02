@@ -12,6 +12,7 @@ Qrio is a self-hostable QR code SaaS. It combines a free public generator with d
 ![Laravel 12](https://img.shields.io/badge/Laravel-12-FF2D20?logo=laravel&logoColor=white)
 ![PHP 8.2+](https://img.shields.io/badge/PHP-8.2+-777BB4?logo=php&logoColor=white)
 ![Stripe](https://img.shields.io/badge/Stripe-billing-635BFF?logo=stripe&logoColor=white)
+![License: MIT](https://img.shields.io/badge/License-MIT-blue)
 
 ## Contents
 
@@ -360,4 +361,4 @@ Please don't report security vulnerabilities in public issues. Contact the maint
 
 ## License
 
-No license has been added to this repository yet. Until a `LICENSE` file is present, default copyright applies.
+Released under the [MIT License](LICENSE).
