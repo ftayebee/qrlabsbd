@@ -1,0 +1,12 @@
+.git
+.claude
+*.zip
+**/.env
+**/.env.*
+**/node_modules
+backend/vendor
+backend/bootstrap/cache/*.php
+backend/database/*.sqlite
+backend/storage/logs/*.log
+frontend/.nuxt
+frontend/.output

@@ -249,53 +249,35 @@ The seeder creates four plans as a starting point. The prices are placeholders, 
 
 The stack runs Nginx, Nuxt, Laravel (PHP-FPM), a queue worker, a scheduler, MySQL 8.4 and Redis 7.4.
 
-**1. Set the stack's values.** Copy the template, then fill in the URLs and passwords:
+Copy the template, fill in your URLs and admin account, then start the stack:
 
 ```bash
-cp .env.docker.example .env.docker
-```
-
-**2. Create `backend/.env.production`.** Compose requires this file, and there is no template for it yet. Start from this, adding any settings from [Configuration](#configuration) that you need:
-
-```dotenv
-APP_NAME=Qrio
-APP_ENV=production
-APP_DEBUG=false
-APP_KEY=
-APP_URL=https://your-domain
-FRONTEND_URL=https://your-domain
-QRIO_SHORT_DOMAIN=https://your-domain
-
-DB_CONNECTION=mysql
-CACHE_STORE=redis
-QUEUE_CONNECTION=redis
-SESSION_DRIVER=redis
-REDIS_CLIENT=phpredis
-
-ADMIN_EMAIL=you@example.com
-ADMIN_PASSWORD=choose-a-strong-password
-```
-
-Generate a value for `APP_KEY` with this command, and paste in the whole output:
-
-```bash
-echo "base64:$(openssl rand -base64 32)"
-```
-
-**3. Start the stack and set up the database.** Migrations don't run automatically:
-
-```bash
-docker compose --env-file .env.docker up -d --build
+cp .env.docker.example .env
 ```
 
 ```bash
-docker compose --env-file .env.docker exec api php artisan migrate --seed --force
+docker compose up -d --build
 ```
 
-**Before going to production:**
+The stack can also boot from `docker-compose.yml` alone with no configuration, which is what a one-click deploy does. In that case, images are built from this GitHub repository.
 
-- **Outbound access.** The `api` and `queue` services are only on the `internal` network, which has no internet access. Stripe, SMTP and S3 calls will fail until you also attach those services to a network with outbound access, such as `edge`.
-- **TLS.** Nginx listens on plain HTTP only. Terminate TLS at a load balancer or add it to `docker/nginx/default.conf`.
+On startup, the stack:
+
+- **Generates secrets.** Any blank `APP_KEY`, `MYSQL_PASSWORD` or `REDIS_PASSWORD` gets a random value, kept on the `qrio-secrets` volume.
+- **Runs migrations.** These run on every deploy. The database is seeded on the first deploy only, because re-seeding resets permissions edited on the built-in roles.
+
+**After deploying:**
+
+- **Create an admin.** The first admin comes from `ADMIN_EMAIL` and `ADMIN_PASSWORD`. If they weren't set on the first deploy, set them and run this command. It also resets the built-in roles' permissions:
+
+  ```bash
+  docker compose exec api php artisan db:seed --force
+  ```
+
+- **Set your URLs.** Set `APP_PUBLIC_URL` and `SHORT_DOMAIN` before printing any codes, then rebuild. They default to `http://localhost`, and dynamic QR codes encode `SHORT_DOMAIN`.
+- **Add TLS.** Nginx listens on plain HTTP only. Terminate TLS at a load balancer or add it to `docker/nginx/default.conf`.
+
+Other settings from [Configuration](#configuration) can go in `.env` too, but only the ones listed in `docker-compose.yml` reach the containers. Changing `MYSQL_PASSWORD` after the first boot doesn't change the password inside MySQL.
 
 ### Shared hosting or separate Node and PHP hosts
 
@@ -345,7 +327,7 @@ cd frontend && npm test
 │   └── server/              Proxy routes to Laravel and the sitemap source
 ├── docker/                  Dockerfiles and Nginx configuration
 ├── docker-compose.yml       Production-oriented stack
-└── .env.docker.example      Template for the Compose values
+└── .env.docker.example      Template for the stack's .env file
 ```
 
 ## Contributing

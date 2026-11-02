@@ -5,7 +5,8 @@
 FROM composer:2.8 AS vendor
 WORKDIR /app
 COPY backend/composer.json backend/composer.lock ./
-RUN composer install --no-dev --no-interaction --no-scripts --no-autoloader --prefer-dist
+# Extensions are installed in the runtime stage, not this one.
+RUN composer install --no-dev --no-interaction --no-scripts --no-autoloader --prefer-dist --ignore-platform-reqs
 COPY backend/ ./
 RUN composer dump-autoload --optimize --classmap-authoritative --no-dev
 
@@ -23,11 +24,13 @@ RUN apk add --no-cache icu-libs libzip fcgi \
 
 COPY docker/backend/php.ini /usr/local/etc/php/conf.d/zz-app.ini
 COPY docker/backend/www.conf /usr/local/etc/php-fpm.d/zz-www.conf
+COPY docker/backend/entrypoint.sh /usr/local/bin/qrio-entrypoint
 
 WORKDIR /var/www/html
 COPY --from=vendor --chown=app:app /app /var/www/html
-RUN mkdir -p storage/framework/{cache,sessions,views} storage/logs bootstrap/cache \
- && chown -R app:app storage bootstrap/cache
+# The secrets directory is created here so a new named volume inherits its owner.
+RUN mkdir -p storage/framework/cache storage/framework/sessions storage/framework/views storage/logs bootstrap/cache /var/lib/qrio-secrets \
+ && chown -R app:app storage bootstrap/cache /var/lib/qrio-secrets
 
 USER app
 EXPOSE 9000
@@ -35,4 +38,5 @@ EXPOSE 9000
 HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
   CMD SCRIPT_NAME=/ping SCRIPT_FILENAME=/ping REQUEST_METHOD=GET cgi-fcgi -bind -connect 127.0.0.1:9000 | grep -q pong || exit 1
 
+ENTRYPOINT ["sh", "/usr/local/bin/qrio-entrypoint"]
 CMD ["php-fpm", "-F"]
