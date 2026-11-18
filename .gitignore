@@ -2,3 +2,6 @@
 .env.docker
 backend/.env.production
 node_modules
+
+# Local deployment bundles; they can contain .env files and databases
+*.zip
